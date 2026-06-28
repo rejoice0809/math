@@ -509,7 +509,11 @@ solveBtn.addEventListener('click', async () => {
           </div>
         </div>`;
       const entry = {
-        id: Date.now(), problem: parsed.problem, answer: parsed.answer,
+        id: Date.now(),
+        problem: parsed.problem,
+        answer: parsed.answer,
+        steps: parsed.steps || [],
+        explanation: parsed.explanation || '',
         time: new Date().toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
       };
       history.unshift(entry);
@@ -533,12 +537,69 @@ function renderHistory() {
     drawerList.innerHTML = '<div class="drawer-empty">아직 풀이 기록이 없어요<br><br>📸 문제를 찍어 풀어보세요!</div>';
     return;
   }
-  drawerList.innerHTML = history.map(h => `
-    <div class="history-item">
-      <div class="history-problem">${h.problem || '문제'}</div>
+  drawerList.innerHTML = history.map((h, i) => `
+    <div class="history-item" onclick="showDetail(${i})">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+        <div class="history-problem">${h.problem || '문제'}</div>
+        <div style="font-size:11px;color:var(--text3);flex-shrink:0;margin-top:2px">${h.time}</div>
+      </div>
       <div class="history-answer">정답: ${h.answer || ''}</div>
-      <div class="history-time">${h.time}</div>
+      ${h.steps && h.steps.length ? `<div style="font-size:11px;color:var(--text3);margin-top:3px">풀이 ${h.steps.length}단계 · 탭하여 상세보기</div>` : ''}
     </div>`).join('');
+}
+
+function showDetail(idx) {
+  const h = history[idx];
+  if (!h) return;
+  const stepsHtml = (h.steps || []).map((s, i) => `
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--border)">
+      <div style="width:22px;height:22px;border-radius:50%;flex-shrink:0;background:var(--blue-glow);border:0.5px solid var(--blue);color:var(--blue);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center">${i+1}</div>
+      <div style="font-size:13px;line-height:1.6;color:var(--text);padding-top:2px">${s}</div>
+    </div>`).join('');
+
+  const detail = document.createElement('div');
+  detail.id = 'detailOverlay';
+  detail.style.cssText = 'position:fixed;inset:0;z-index:100;background:var(--bg);overflow-y:auto;padding-bottom:env(safe-area-inset-bottom,0px)';
+  detail.innerHTML = `
+    <div style="position:sticky;top:0;background:var(--bg);border-bottom:0.5px solid var(--border);padding:14px 16px;display:flex;align-items:center;gap:12px;z-index:1">
+      <button onclick="document.getElementById('detailOverlay').remove()" style="background:var(--surface);border:0.5px solid var(--border2);border-radius:8px;padding:6px 12px;color:var(--text2);font-size:13px;cursor:pointer">← 뒤로</button>
+      <div style="font-size:15px;font-weight:600">풀이 상세</div>
+      <div style="font-size:11px;color:var(--text3);margin-left:auto">${h.time}</div>
+    </div>
+    <div style="padding:16px;display:flex;flex-direction:column;gap:10px">
+      <div style="background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;overflow:hidden">
+        <div style="padding:11px 16px;border-bottom:0.5px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);display:flex;align-items:center;gap:6px">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--blue)"></div>인식된 문제
+        </div>
+        <div style="padding:14px 16px;font-size:14px;line-height:1.7;color:var(--text)">${h.problem || ''}</div>
+      </div>
+      ${h.steps && h.steps.length ? `
+      <div style="background:var(--surface);border:0.5px solid var(--border2);border-radius:14px;overflow:hidden">
+        <div style="padding:11px 16px;border-bottom:0.5px solid var(--border);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);display:flex;align-items:center;gap:6px">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--blue)"></div>풀이 과정
+        </div>
+        <div style="padding:4px 16px 6px">${stepsHtml}</div>
+      </div>` : ''}
+      <div style="background:rgba(34,197,94,0.12);border:0.5px solid rgba(34,197,94,0.25);border-radius:14px;overflow:hidden">
+        <div style="padding:11px 16px;border-bottom:0.5px solid rgba(34,197,94,0.2);font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3);display:flex;align-items:center;gap:6px">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--green)"></div>정답
+        </div>
+        <div style="padding:14px 16px">
+          <div style="font-size:26px;font-weight:700;color:var(--green);letter-spacing:-0.5px">${h.answer || ''}</div>
+          ${h.explanation ? `<div style="font-size:13px;color:var(--text2);margin-top:6px;line-height:1.5">💡 ${h.explanation}</div>` : ''}
+        </div>
+      </div>
+      <button onclick="deleteHistory(${idx})" style="width:100%;padding:12px;border-radius:10px;background:var(--red-dim);border:0.5px solid rgba(239,68,68,0.25);color:var(--red);font-size:13px;cursor:pointer;margin-top:4px">🗑️ 이 기록 삭제</button>
+    </div>`;
+  document.body.appendChild(detail);
+}
+
+function deleteHistory(idx) {
+  if (!confirm('이 기록을 삭제할까요?')) return;
+  history.splice(idx, 1);
+  localStorage.setItem('mathHistory', JSON.stringify(history));
+  document.getElementById('detailOverlay')?.remove();
+  renderHistory();
 }
 </script>
 </body>
