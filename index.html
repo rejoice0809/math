@@ -226,16 +226,26 @@
 
   <div class="main">
     <div style="margin-top:4px">
-      <div class="upload-card" id="uploadCard">
-        <input type="file" id="fileInput" accept="image/*" capture="environment">
-        <div class="upload-icon">📸</div>
-        <div class="upload-label">사진 찍기 또는 업로드</div>
-        <div class="upload-sub">수학 문제가 잘 보이게 찍어주세요</div>
+      <input type="file" id="fileInput" accept="image/*" style="display:none">
+      <input type="file" id="fileCamera" accept="image/*" capture="environment" style="display:none">
+      <div id="uploadCard">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <button class="upload-card" id="btnGallery" style="min-height:130px">
+            <div class="upload-icon">🖼️</div>
+            <div class="upload-label" style="font-size:14px">갤러리</div>
+            <div class="upload-sub">사진 선택</div>
+          </button>
+          <button class="upload-card" id="btnCamera" style="min-height:130px">
+            <div class="upload-icon">📷</div>
+            <div class="upload-label" style="font-size:14px">카메라</div>
+            <div class="upload-sub">지금 찍기</div>
+          </button>
+        </div>
       </div>
       <div id="previewSection" style="display:none">
         <img id="previewImg" class="preview-img" alt="업로드된 수학 문제">
         <div class="img-actions">
-          <button class="img-action-btn" id="retakeBtn">📷 다시 찍기</button>
+          <button class="img-action-btn" id="retakeBtn">🔄 다시 선택</button>
           <button class="img-action-btn" id="cropHint" style="color:#60a5fa;border-color:rgba(59,130,246,0.3)">✂️ 문제 부분만</button>
         </div>
       </div>
@@ -322,6 +332,7 @@ resetKeyBtn.addEventListener('click', () => {
 
 // ── 앱 로직 ──
 const fileInput = document.getElementById('fileInput');
+const fileCamera = document.getElementById('fileCamera');
 const uploadCard = document.getElementById('uploadCard');
 const previewSection = document.getElementById('previewSection');
 const previewImg = document.getElementById('previewImg');
@@ -343,8 +354,10 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js').catch(() => {});
 }
 
-fileInput.addEventListener('change', e => {
-  const file = e.target.files[0];
+document.getElementById('btnGallery').addEventListener('click', () => fileInput.click());
+document.getElementById('btnCamera').addEventListener('click', () => fileCamera.click());
+
+function handleFile(file) {
   if (!file) return;
   const reader = new FileReader();
   reader.onload = ev => {
@@ -360,12 +373,15 @@ fileInput.addEventListener('change', e => {
     resultArea.innerHTML = '';
   };
   reader.readAsDataURL(file);
-});
+}
+
+fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+fileCamera.addEventListener('change', e => handleFile(e.target.files[0]));
 
 retakeBtn.addEventListener('click', () => {
   currentBase64 = null; currentType = null;
-  previewImg.src = ''; fileInput.value = '';
-  uploadCard.style.display = 'flex';
+  previewImg.src = ''; fileInput.value = ''; fileCamera.value = '';
+  uploadCard.style.display = 'block';
   previewSection.style.display = 'none';
   solveBtn.disabled = true;
   solveBtnIcon.textContent = '🔍';
