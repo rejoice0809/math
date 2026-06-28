@@ -12,204 +12,131 @@
 <title>수학 문제 풀기</title>
 <style>
   :root {
-    --bg: #0f0f0f;
-    --surface: #1a1a1a;
-    --surface2: #222222;
-    --border: #2a2a2a;
-    --border2: #333;
-    --blue: #3b82f6;
-    --blue-dim: #1d4ed8;
-    --blue-glow: rgba(59,130,246,0.15);
-    --text: #f0f0f0;
-    --text2: #a0a0a0;
-    --text3: #606060;
-    --green: #22c55e;
-    --green-dim: rgba(34,197,94,0.12);
-    --red: #ef4444;
-    --red-dim: rgba(239,68,68,0.12);
-    --radius: 14px;
-    --safe-top: env(safe-area-inset-top, 0px);
-    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#222;
+    --border:#2a2a2a;--border2:#333;
+    --blue:#3b82f6;--blue-dim:#1d4ed8;--blue-glow:rgba(59,130,246,0.15);
+    --text:#f0f0f0;--text2:#a0a0a0;--text3:#606060;
+    --green:#22c55e;--green-dim:rgba(34,197,94,0.12);
+    --red:#ef4444;--red-dim:rgba(239,68,68,0.12);
+    --radius:14px;
+    --safe-top:env(safe-area-inset-top,0px);
+    --safe-bottom:env(safe-area-inset-bottom,0px);
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
-    background: var(--bg); color: var(--text);
-    min-height: 100dvh;
-    padding-top: var(--safe-top); padding-bottom: var(--safe-bottom);
-    overscroll-behavior: none;
-  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{font-family:-apple-system,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;padding-top:var(--safe-top);padding-bottom:var(--safe-bottom);overscroll-behavior:none}
 
-  /* API Key Screen */
-  .api-screen {
-    min-height: 100dvh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 32px 24px; text-align: center;
-  }
-  .api-logo { font-size: 56px; margin-bottom: 20px; }
-  .api-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
-  .api-desc { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 28px; }
-  .api-input-wrap { width: 100%; position: relative; margin-bottom: 12px; }
-  .api-input {
-    width: 100%; padding: 14px 48px 14px 16px;
-    background: var(--surface); border: 1px solid var(--border2);
-    border-radius: 12px; color: var(--text); font-size: 14px;
-    font-family: monospace; outline: none;
-  }
-  .api-input:focus { border-color: var(--blue); }
-  .api-toggle {
-    position: absolute; right: 14px; top: 50%; transform: translateY(-50%);
-    background: none; border: none; color: var(--text3); font-size: 18px; cursor: pointer;
-  }
-  .api-save-btn {
-    width: 100%; padding: 15px; border-radius: 12px;
-    background: var(--blue); color: #fff;
-    font-size: 16px; font-weight: 600; border: none; cursor: pointer;
-    margin-bottom: 16px;
-  }
-  .api-save-btn:active { background: var(--blue-dim); }
-  .api-help {
-    font-size: 12px; color: var(--text3); line-height: 1.7;
-  }
-  .api-help a { color: var(--blue); text-decoration: none; }
+  /* API 키 화면 */
+  .api-screen{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center}
+  .api-logo{font-size:56px;margin-bottom:20px}
+  .api-title{font-size:22px;font-weight:700;margin-bottom:8px}
+  .api-desc{font-size:14px;color:var(--text2);line-height:1.7;margin-bottom:28px}
+  .api-input-wrap{width:100%;position:relative;margin-bottom:12px}
+  .api-input{width:100%;padding:14px 48px 14px 16px;background:var(--surface);border:1px solid var(--border2);border-radius:12px;color:var(--text);font-size:14px;font-family:monospace;outline:none}
+  .api-input:focus{border-color:var(--blue)}
+  .api-toggle{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);font-size:18px;cursor:pointer}
+  .api-save-btn{width:100%;padding:15px;border-radius:12px;background:var(--blue);color:#fff;font-size:16px;font-weight:600;border:none;cursor:pointer;margin-bottom:20px}
+  .api-save-btn:active{background:var(--blue-dim)}
+  .api-help{font-size:13px;color:var(--text3);line-height:1.8}
+  .api-help a{color:var(--blue);text-decoration:none}
+  .api-steps{text-align:left;background:var(--surface);border-radius:12px;padding:16px;margin-top:16px;width:100%}
+  .api-steps p{font-size:13px;color:var(--text2);line-height:1.8}
+  .api-steps strong{color:var(--text)}
 
-  /* Header */
-  .header {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 16px 20px 12px; border-bottom: 0.5px solid var(--border);
-    position: sticky; top: 0; background: var(--bg); z-index: 10;
-  }
-  .header-logo { display: flex; align-items: center; gap: 10px; }
-  .logo-icon { width: 34px; height: 34px; background: var(--blue); border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
-  .header-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
-  .header-btns { display: flex; gap: 8px; }
-  .header-btn {
-    background: var(--surface); border: 0.5px solid var(--border2);
-    border-radius: 10px; padding: 7px 12px; color: var(--text2);
-    font-size: 13px; cursor: pointer;
-  }
-  .header-btn:active { opacity: 0.7; }
+  /* 헤더 */
+  .header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px 12px;border-bottom:0.5px solid var(--border);position:sticky;top:0;background:var(--bg);z-index:10}
+  .header-logo{display:flex;align-items:center;gap:10px}
+  .logo-icon{width:34px;height:34px;background:var(--blue);border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px}
+  .header-sub{font-size:11px;color:var(--text3);margin-top:1px}
+  .header-btns{display:flex;gap:8px}
+  .header-btn{background:var(--surface);border:0.5px solid var(--border2);border-radius:10px;padding:7px 12px;color:var(--text2);font-size:13px;cursor:pointer}
 
-  .main { padding: 20px 16px 100px; }
+  .main{padding:20px 16px 100px}
 
-  /* Upload */
-  .upload-card {
-    border: 1.5px dashed var(--border2); border-radius: var(--radius);
-    background: var(--surface); position: relative; overflow: hidden;
-    min-height: 200px; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; gap: 10px; cursor: pointer;
-  }
-  .upload-card:active { background: var(--surface2); }
-  .upload-card input[type=file] { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-  .upload-icon { font-size: 40px; }
-  .upload-label { font-size: 15px; font-weight: 500; }
-  .upload-sub { font-size: 12px; color: var(--text3); }
-  .preview-img { width: 100%; display: block; border-radius: 12px; max-height: 320px; object-fit: contain; background: #111; }
-  .img-actions { display: flex; gap: 8px; margin-top: 10px; }
-  .img-action-btn {
-    flex: 1; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 500;
-    cursor: pointer; border: 0.5px solid var(--border2); background: var(--surface2);
-    color: var(--text2); display: flex; align-items: center; justify-content: center; gap: 6px;
-  }
-  .tips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; margin-top: 14px; scrollbar-width: none; }
-  .tips::-webkit-scrollbar { display: none; }
-  .tip-chip {
-    flex-shrink: 0; padding: 6px 12px; border-radius: 20px;
-    background: var(--surface); border: 0.5px solid var(--border2);
-    font-size: 12px; color: var(--text2); white-space: nowrap;
-  }
+  /* 업로드 */
+  .upload-card{border:1.5px dashed var(--border2);border-radius:var(--radius);background:var(--surface);min-height:130px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;cursor:pointer;width:100%}
+  .upload-card:active{background:var(--surface2)}
+  .upload-icon{font-size:36px}
+  .upload-label{font-size:14px;font-weight:500}
+  .upload-sub{font-size:12px;color:var(--text3)}
+  .preview-img{width:100%;display:block;border-radius:12px;max-height:320px;object-fit:contain;background:#111}
+  .img-actions{display:flex;gap:8px;margin-top:10px}
+  .img-action-btn{flex:1;padding:10px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;border:0.5px solid var(--border2);background:var(--surface2);color:var(--text2);display:flex;align-items:center;justify-content:center;gap:6px}
+  .tips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-top:14px;scrollbar-width:none}
+  .tips::-webkit-scrollbar{display:none}
+  .tip-chip{flex-shrink:0;padding:6px 12px;border-radius:20px;background:var(--surface);border:0.5px solid var(--border2);font-size:12px;color:var(--text2);white-space:nowrap}
 
-  /* Solve button */
-  .solve-wrap {
-    position: fixed; bottom: 0; left: 0; right: 0;
-    padding: 12px 16px calc(12px + var(--safe-bottom));
-    background: linear-gradient(to top, var(--bg) 70%, transparent); z-index: 20;
-  }
-  .solve-btn {
-    width: 100%; padding: 16px; border-radius: 14px;
-    background: var(--blue); color: #fff;
-    font-size: 16px; font-weight: 600; border: none; cursor: pointer;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
-    box-shadow: 0 4px 20px rgba(59,130,246,0.3);
-  }
-  .solve-btn:active { transform: scale(0.98); background: var(--blue-dim); }
-  .solve-btn:disabled { background: #1e293b; color: #475569; box-shadow: none; cursor: not-allowed; }
+  /* 풀기 버튼 */
+  .solve-wrap{position:fixed;bottom:0;left:0;right:0;padding:12px 16px calc(12px + var(--safe-bottom));background:linear-gradient(to top,var(--bg) 70%,transparent);z-index:20}
+  .solve-btn{width:100%;padding:16px;border-radius:14px;background:var(--blue);color:#fff;font-size:16px;font-weight:600;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 4px 20px rgba(59,130,246,0.3)}
+  .solve-btn:active{transform:scale(0.98);background:var(--blue-dim)}
+  .solve-btn:disabled{background:#1e293b;color:#475569;box-shadow:none;cursor:not-allowed}
 
-  /* Result */
-  .result-wrap { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-  .result-block { background: var(--surface); border: 0.5px solid var(--border2); border-radius: var(--radius); overflow: hidden; }
-  .block-header {
-    padding: 12px 16px 10px; border-bottom: 0.5px solid var(--border);
-    display: flex; align-items: center; gap: 8px;
-    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text3);
-  }
-  .block-header-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue); flex-shrink: 0; }
-  .block-body { padding: 14px 16px; }
-  .problem-text { font-size: 15px; line-height: 1.6; }
-  .step-item { display: flex; gap: 12px; align-items: flex-start; padding: 10px 0; border-bottom: 0.5px solid var(--border); }
-  .step-item:last-child { border-bottom: none; padding-bottom: 0; }
-  .step-num {
-    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
-    background: var(--blue-glow); border: 0.5px solid var(--blue);
-    color: var(--blue); font-size: 12px; font-weight: 600;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .step-text { font-size: 14px; line-height: 1.65; padding-top: 2px; }
-  .answer-block { background: var(--green-dim); border-color: rgba(34,197,94,0.25); }
-  .answer-num { font-size: 28px; font-weight: 700; color: var(--green); letter-spacing: -0.5px; }
-  .answer-concept { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.5; }
-  .error-box {
-    background: var(--red-dim); border: 0.5px solid rgba(239,68,68,0.25);
-    border-radius: var(--radius); padding: 14px 16px;
-    color: var(--red); font-size: 14px; display: flex; align-items: center; gap: 10px; margin-top: 20px;
-  }
-  .loading-box { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 32px 16px; background: var(--surface); border-radius: var(--radius); border: 0.5px solid var(--border2); margin-top: 20px; }
-  .spinner { width: 36px; height: 36px; border-radius: 50%; border: 2.5px solid var(--border2); border-top-color: var(--blue); animation: spin 0.8s linear infinite; }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text { font-size: 14px; color: var(--text2); }
-  .loading-dots::after { content: ''; animation: dots 1.5s steps(4, end) infinite; }
-  @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+  /* 결과 */
+  .result-wrap{margin-top:20px;display:flex;flex-direction:column;gap:10px}
+  .result-block{background:var(--surface);border:0.5px solid var(--border2);border-radius:var(--radius);overflow:hidden}
+  .block-header{padding:12px 16px 10px;border-bottom:0.5px solid var(--border);display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;color:var(--text3)}
+  .block-dot{width:7px;height:7px;border-radius:50%;background:var(--blue);flex-shrink:0}
+  .block-body{padding:14px 16px}
+  .problem-text{font-size:15px;line-height:1.6}
+  .step-item{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:0.5px solid var(--border)}
+  .step-item:last-child{border-bottom:none;padding-bottom:0}
+  .step-num{width:24px;height:24px;border-radius:50%;flex-shrink:0;background:var(--blue-glow);border:0.5px solid var(--blue);color:var(--blue);font-size:12px;font-weight:600;display:flex;align-items:center;justify-content:center}
+  .step-text{font-size:14px;line-height:1.65;padding-top:2px}
+  .answer-block{background:var(--green-dim);border-color:rgba(34,197,94,0.25)}
+  .answer-num{font-size:28px;font-weight:700;color:var(--green);letter-spacing:-0.5px}
+  .answer-concept{font-size:13px;color:var(--text2);margin-top:6px;line-height:1.5}
+  .error-box{background:var(--red-dim);border:0.5px solid rgba(239,68,68,0.25);border-radius:var(--radius);padding:14px 16px;color:var(--red);font-size:14px;margin-top:20px}
+  .loading-box{display:flex;flex-direction:column;align-items:center;gap:12px;padding:32px 16px;background:var(--surface);border-radius:var(--radius);border:0.5px solid var(--border2);margin-top:20px}
+  .spinner{width:36px;height:36px;border-radius:50%;border:2.5px solid var(--border2);border-top-color:var(--blue);animation:spin 0.8s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .loading-text{font-size:14px;color:var(--text2)}
+  .loading-dots::after{content:'';animation:dots 1.5s steps(4,end) infinite}
+  @keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
 
-  /* History drawer */
-  .drawer-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 50; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
-  .drawer-bg.open { opacity: 1; pointer-events: all; }
-  .drawer { position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface); border-radius: 20px 20px 0 0; z-index: 51; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1); max-height: 75dvh; display: flex; flex-direction: column; padding-bottom: var(--safe-bottom); }
-  .drawer.open { transform: translateY(0); }
-  .drawer-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border2); margin: 12px auto 4px; flex-shrink: 0; }
-  .drawer-title { font-size: 16px; font-weight: 600; padding: 8px 20px 14px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
-  .drawer-list { overflow-y: auto; flex: 1; }
-  .history-item { padding: 14px 20px; border-bottom: 0.5px solid var(--border); cursor: pointer; }
-  .history-item:active { background: var(--surface2); }
-  .history-problem { font-size: 14px; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .history-answer { font-size: 13px; color: var(--green); font-weight: 500; }
-  .history-time { font-size: 11px; color: var(--text3); margin-top: 2px; }
-  .drawer-empty { padding: 40px 20px; text-align: center; color: var(--text3); font-size: 14px; }
+  /* 히스토리 드로어 */
+  .drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:50;opacity:0;pointer-events:none;transition:opacity 0.25s}
+  .drawer-bg.open{opacity:1;pointer-events:all}
+  .drawer{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:20px 20px 0 0;z-index:51;transform:translateY(100%);transition:transform 0.3s cubic-bezier(0.32,0.72,0,1);max-height:75dvh;display:flex;flex-direction:column;padding-bottom:var(--safe-bottom)}
+  .drawer.open{transform:translateY(0)}
+  .drawer-handle{width:36px;height:4px;border-radius:2px;background:var(--border2);margin:12px auto 4px;flex-shrink:0}
+  .drawer-title{font-size:16px;font-weight:600;padding:8px 20px 14px;border-bottom:0.5px solid var(--border);flex-shrink:0}
+  .drawer-list{overflow-y:auto;flex:1}
+  .history-item{padding:14px 20px;border-bottom:0.5px solid var(--border);cursor:pointer}
+  .history-item:active{background:var(--surface2)}
+  .history-problem{font-size:14px;color:var(--text);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .history-answer{font-size:13px;color:var(--green);font-weight:500}
+  .history-time{font-size:11px;color:var(--text3);margin-top:2px}
+  .drawer-empty{padding:40px 20px;text-align:center;color:var(--text3);font-size:14px}
 </style>
 </head>
 <body>
 
-<!-- ① API 키 입력 화면 -->
+<!-- API 키 입력 화면 -->
 <div id="apiScreen" class="api-screen">
   <div class="api-logo">🧮</div>
   <div class="api-title">수학 문제 풀기</div>
-  <div class="api-desc">
-    Google Gemini API 키를 입력해주세요. (무료)<br>
-    키는 이 기기에만 저장되며 외부로 전송되지 않아요.
-  </div>
+  <div class="api-desc">Google Gemini API 키를 입력하면<br>무료로 수학 문제를 풀 수 있어요!</div>
   <div class="api-input-wrap">
-    <input class="api-input" type="password" id="apiKeyInput" placeholder="AIza..." autocomplete="off" autocorrect="off" spellcheck="false">
+    <input class="api-input" type="password" id="apiKeyInput" placeholder="AIzaSy..." autocomplete="off" spellcheck="false">
     <button class="api-toggle" id="apiToggle">👁</button>
   </div>
   <button class="api-save-btn" id="apiSaveBtn">시작하기</button>
   <div class="api-help">
-    API 키가 없으신가요?<br>
-    <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a> 에서 무료로 발급받으세요.<br>
-    (Google 계정으로 로그인 → Get API Key)<br><br>
-    🔒 키는 이 기기의 브라우저에만 저장됩니다
+    🔑 API 키 무료 발급:<br>
+    <a href="https://aistudio.google.com/app/apikey" target="_blank">aistudio.google.com</a> 접속
+  </div>
+  <div class="api-steps">
+    <p>
+      <strong>① aistudio.google.com 접속</strong><br>
+      <strong>② Google 계정 로그인</strong><br>
+      <strong>③ 왼쪽 하단 🗝️ 아이콘 탭</strong><br>
+      <strong>④ "Create API key" 클릭</strong><br>
+      <strong>⑤ 생성된 키 복사 후 위에 붙여넣기</strong>
+    </p>
   </div>
 </div>
 
-<!-- ② 메인 앱 화면 -->
+<!-- 메인 앱 -->
 <div id="appScreen" style="display:none">
   <div class="header">
     <div class="header-logo">
@@ -226,37 +153,39 @@
   </div>
 
   <div class="main">
-    <div style="margin-top:4px">
-      <input type="file" id="fileInput" accept="image/*" style="display:none">
-      <input type="file" id="fileCamera" accept="image/*" capture="environment" style="display:none">
-      <div id="uploadCard">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
-          <button class="upload-card" id="btnGallery" style="min-height:130px">
-            <div class="upload-icon">🖼️</div>
-            <div class="upload-label" style="font-size:14px">갤러리</div>
-            <div class="upload-sub">사진 선택</div>
-          </button>
-          <button class="upload-card" id="btnCamera" style="min-height:130px">
-            <div class="upload-icon">📷</div>
-            <div class="upload-label" style="font-size:14px">카메라</div>
-            <div class="upload-sub">지금 찍기</div>
-          </button>
-        </div>
-      </div>
-      <div id="previewSection" style="display:none">
-        <img id="previewImg" class="preview-img" alt="업로드된 수학 문제">
-        <div class="img-actions">
-          <button class="img-action-btn" id="retakeBtn">🔄 다시 선택</button>
-          <button class="img-action-btn" id="cropHint" style="color:#60a5fa;border-color:rgba(59,130,246,0.3)">✂️ 문제 부분만</button>
-        </div>
+    <input type="file" id="fileInput" accept="image/*" style="display:none">
+    <input type="file" id="fileCamera" accept="image/*" capture="environment" style="display:none">
+
+    <div id="uploadCard">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px">
+        <button class="upload-card" id="btnGallery">
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-label">갤러리</div>
+          <div class="upload-sub">사진 선택</div>
+        </button>
+        <button class="upload-card" id="btnCamera">
+          <div class="upload-icon">📷</div>
+          <div class="upload-label">카메라</div>
+          <div class="upload-sub">지금 찍기</div>
+        </button>
       </div>
     </div>
+
+    <div id="previewSection" style="display:none;margin-top:4px">
+      <img id="previewImg" class="preview-img" alt="수학 문제">
+      <div class="img-actions">
+        <button class="img-action-btn" id="retakeBtn">🔄 다시 선택</button>
+        <button class="img-action-btn" id="cropHint" style="color:#60a5fa;border-color:rgba(59,130,246,0.3)">✂️ 문제 부분만</button>
+      </div>
+    </div>
+
     <div class="tips">
       <div class="tip-chip">💡 글씨가 선명하게</div>
       <div class="tip-chip">🔦 밝은 곳에서 촬영</div>
       <div class="tip-chip">📐 수직으로 정면에서</div>
       <div class="tip-chip">✂️ 문제만 포함하기</div>
     </div>
+
     <div id="resultArea"></div>
   </div>
 
@@ -268,7 +197,7 @@
   </div>
 </div>
 
-<!-- History drawer -->
+<!-- 히스토리 드로어 -->
 <div class="drawer-bg" id="drawerBg"></div>
 <div class="drawer" id="drawer">
   <div class="drawer-handle"></div>
@@ -277,83 +206,55 @@
 </div>
 
 <script>
-// ── API 키 관리 ──
+// ── API 키 관리
+let API_KEY = localStorage.getItem('mathApiKey') || '';
 const apiScreen = document.getElementById('apiScreen');
 const appScreen = document.getElementById('appScreen');
-const apiKeyInput = document.getElementById('apiKeyInput');
-const apiSaveBtn = document.getElementById('apiSaveBtn');
-const apiToggle = document.getElementById('apiToggle');
-const resetKeyBtn = document.getElementById('resetKeyBtn');
 
-let API_KEY = localStorage.getItem('mathApiKey') || '';
+if (API_KEY) { appScreen.style.display='block'; apiScreen.style.display='none'; }
 
-function showApiScreen() {
-  apiScreen.style.display = 'flex';
-  appScreen.style.display = 'none';
-}
-function showAppScreen() {
-  apiScreen.style.display = 'none';
-  appScreen.style.display = 'block';
-}
-
-if (API_KEY) {
-  showAppScreen();
-} else {
-  showApiScreen();
-}
-
-apiToggle.addEventListener('click', () => {
-  apiKeyInput.type = apiKeyInput.type === 'password' ? 'text' : 'password';
-  apiToggle.textContent = apiKeyInput.type === 'password' ? '👁' : '🙈';
+document.getElementById('apiToggle').addEventListener('click', () => {
+  const inp = document.getElementById('apiKeyInput');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
 });
 
-apiSaveBtn.addEventListener('click', () => {
-  const key = apiKeyInput.value.trim();
-  if (!key.startsWith('AIza') || key.length < 30) {
-    alert('❌ 올바른 Gemini API 키 형식이 아닙니다.\nAIza 로 시작하는 키를 입력해주세요.');
-    return;
-  }
+document.getElementById('apiSaveBtn').addEventListener('click', () => {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (key.length < 10) { alert('API 키를 입력해주세요.'); return; }
   API_KEY = key;
   localStorage.setItem('mathApiKey', key);
-  showAppScreen();
+  apiScreen.style.display = 'none';
+  appScreen.style.display = 'block';
 });
 
-apiKeyInput.addEventListener('keydown', e => {
-  if (e.key === 'Enter') apiSaveBtn.click();
+document.getElementById('apiKeyInput').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('apiSaveBtn').click();
 });
 
-resetKeyBtn.addEventListener('click', () => {
+document.getElementById('resetKeyBtn').addEventListener('click', () => {
   if (confirm('API 키를 변경하시겠어요?')) {
     localStorage.removeItem('mathApiKey');
     API_KEY = '';
-    apiKeyInput.value = '';
-    showApiScreen();
+    document.getElementById('apiKeyInput').value = '';
+    appScreen.style.display = 'none';
+    apiScreen.style.display = 'flex';
   }
 });
 
-// ── 앱 로직 ──
+// ── 파일 처리
 const fileInput = document.getElementById('fileInput');
 const fileCamera = document.getElementById('fileCamera');
 const uploadCard = document.getElementById('uploadCard');
 const previewSection = document.getElementById('previewSection');
 const previewImg = document.getElementById('previewImg');
-const retakeBtn = document.getElementById('retakeBtn');
 const solveBtn = document.getElementById('solveBtn');
 const solveBtnIcon = document.getElementById('solveBtnIcon');
 const solveBtnText = document.getElementById('solveBtnText');
 const resultArea = document.getElementById('resultArea');
-const historyBtn = document.getElementById('historyBtn');
-const drawer = document.getElementById('drawer');
-const drawerBg = document.getElementById('drawerBg');
-const drawerList = document.getElementById('drawerList');
-
-let currentBase64 = null;
-let currentType = null;
+let currentBase64 = null, currentType = null;
 let history = JSON.parse(localStorage.getItem('mathHistory') || '[]');
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js').catch(() => {});
-}
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
 document.getElementById('btnGallery').addEventListener('click', () => fileInput.click());
 document.getElementById('btnCamera').addEventListener('click', () => fileCamera.click());
@@ -375,11 +276,10 @@ function handleFile(file) {
   };
   reader.readAsDataURL(file);
 }
-
 fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
 fileCamera.addEventListener('change', e => handleFile(e.target.files[0]));
 
-retakeBtn.addEventListener('click', () => {
+document.getElementById('retakeBtn').addEventListener('click', () => {
   currentBase64 = null; currentType = null;
   previewImg.src = ''; fileInput.value = ''; fileCamera.value = '';
   uploadCard.style.display = 'block';
@@ -391,9 +291,10 @@ retakeBtn.addEventListener('click', () => {
 });
 
 document.getElementById('cropHint').addEventListener('click', () => {
-  alert('💡 팁: 문제 부분만 잘라서 찍으면 더 정확하게 인식해요!');
+  alert('💡 문제 부분만 잘라서 찍으면 더 정확하게 인식해요!');
 });
 
+// ── Gemini API 호출
 solveBtn.addEventListener('click', async () => {
   if (!currentBase64 || solveBtn.disabled) return;
   solveBtn.disabled = true;
@@ -402,104 +303,96 @@ solveBtn.addEventListener('click', async () => {
   resultArea.innerHTML = `
     <div class="loading-box">
       <div class="spinner"></div>
-      <div class="loading-text">문제를 인식하는 중<span class="loading-dots"></span></div>
+      <div class="loading-text">Gemini가 문제를 분석하는 중<span class="loading-dots"></span></div>
     </div>`;
 
   try {
+    const prompt = `당신은 수학 문제 풀이 전문가입니다.
+이미지에서 수학 문제를 찾아 풀어주세요.
+아래 JSON 형식으로만 답하세요. 설명이나 다른 텍스트는 절대 포함하지 마세요.
+
+{"problem":"문제 내용","steps":["풀이1","풀이2","풀이3"],"answer":"정답","explanation":"핵심 개념"}
+
+수학 문제가 없으면: {"error":"수학 문제를 찾을 수 없습니다"}`;
+
     const resp = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          contents: [{
-            parts: [
-              { inline_data: { mime_type: currentType, data: currentBase64 } },
-              { text: `이 이미지의 수학 문제를 풀어주세요. 반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트는 절대 포함하지 마세요:
-{"problem":"인식된 수학 문제 텍스트","steps":["풀이 단계1","풀이 단계2","풀이 단계3"],"answer":"최종 답","explanation":"핵심 개념 한 줄 설명"}
-수학 문제가 없으면: {"error":"수학 문제를 찾을 수 없습니다"}` }
-            ]
-          }],
-          generationConfig: {
-            temperature: 0.1,
-            maxOutputTokens: 1500,
-            responseMimeType: 'application/json'
-          }
+          contents: [{ parts: [
+            { inline_data: { mime_type: currentType, data: currentBase64 } },
+            { text: prompt }
+          ]}],
+          generationConfig: { temperature: 0, maxOutputTokens: 2000 }
         })
       }
     );
 
     const data = await resp.json();
-    if (data.error) throw new Error(data.error.message || 'API 오류');
 
-    const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // API 에러 체크
+    if (data.error) throw new Error(data.error.message);
 
-    // 전체 응답 디버그 출력
-    if (!raw) {
-      resultArea.innerHTML = `
-        <div class="error-box" style="flex-direction:column;align-items:flex-start;gap:6px">
-          <div>⚠️ 응답 없음 — 전체 데이터:</div>
-          <div style="font-size:11px;color:#fca5a5;word-break:break-all;background:#1a0000;padding:8px;border-radius:6px;width:100%;max-height:200px;overflow-y:auto">${JSON.stringify(data, null, 2)}</div>
-        </div>`;
-      return;
-    }
+    // 응답 텍스트 추출
+    const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!raw) throw new Error('Gemini 응답이 비어있습니다. API 키를 확인해주세요.');
 
-    let parsed;
-    try {
-      const clean = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
-      parsed = JSON.parse(clean);
-    } catch {
-      try {
-        const match = raw.match(/\{[\s\S]*\}/);
-        parsed = match ? JSON.parse(match[0]) : null;
-      } catch { parsed = null; }
+    // JSON 파싱 — 가능한 모든 방법 시도
+    let parsed = null;
+    const attempts = [
+      () => JSON.parse(raw),
+      () => JSON.parse(raw.trim()),
+      () => { const m = raw.match(/\{[\s\S]*\}/); return m ? JSON.parse(m[0]) : null; },
+      () => JSON.parse(raw.replace(/[\u0000-\u001F\u007F]/g, ' ')),
+    ];
+    for (const attempt of attempts) {
+      try { parsed = attempt(); if (parsed) break; } catch {}
     }
 
     if (!parsed) {
+      // 파싱 실패 시 Gemini 응답을 텍스트로 그냥 보여줌
       resultArea.innerHTML = `
-        <div class="error-box" style="flex-direction:column;align-items:flex-start;gap:6px">
-          <div>⚠️ 파싱 실패 — 실제 응답:</div>
-          <div style="font-size:11px;color:#fca5a5;word-break:break-all;background:#1a0000;padding:8px;border-radius:6px;width:100%;max-height:200px;overflow-y:auto">${raw}</div>
+        <div class="result-wrap">
+          <div class="result-block">
+            <div class="block-header"><div class="block-dot"></div>Gemini 풀이</div>
+            <div class="block-body"><div class="problem-text" style="white-space:pre-wrap">${raw}</div></div>
+          </div>
         </div>`;
-      return;
-    }
-
-    if (parsed.error) {
+    } else if (parsed.error) {
       resultArea.innerHTML = `<div class="error-box">⚠️ ${parsed.error}</div>`;
     } else {
       const stepsHtml = (parsed.steps || []).map((s, i) => `
         <div class="step-item">
-          <div class="step-num">${i + 1}</div>
+          <div class="step-num">${i+1}</div>
           <div class="step-text">${s}</div>
         </div>`).join('');
       resultArea.innerHTML = `
         <div class="result-wrap">
           <div class="result-block">
-            <div class="block-header"><div class="block-header-dot"></div>인식된 문제</div>
-            <div class="block-body"><div class="problem-text">${parsed.problem || ''}</div></div>
+            <div class="block-header"><div class="block-dot"></div>인식된 문제</div>
+            <div class="block-body"><div class="problem-text">${parsed.problem||''}</div></div>
           </div>
           <div class="result-block">
-            <div class="block-header"><div class="block-header-dot"></div>풀이 과정</div>
+            <div class="block-header"><div class="block-dot"></div>풀이 과정</div>
             <div class="block-body">${stepsHtml}</div>
           </div>
           <div class="result-block answer-block">
-            <div class="block-header"><div class="block-header-dot" style="background:var(--green)"></div>정답</div>
+            <div class="block-header"><div class="block-dot" style="background:var(--green)"></div>정답</div>
             <div class="block-body">
-              <div class="answer-num">${parsed.answer || ''}</div>
-              ${parsed.explanation ? `<div class="answer-concept">💡 ${parsed.explanation}</div>` : ''}
+              <div class="answer-num">${parsed.answer||''}</div>
+              ${parsed.explanation?`<div class="answer-concept">💡 ${parsed.explanation}</div>`:''}
             </div>
           </div>
         </div>`;
-      const entry = {
-        id: Date.now(), problem: parsed.problem, answer: parsed.answer,
-        time: new Date().toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-      };
-      history.unshift(entry);
-      if (history.length > 20) history = history.slice(0, 20);
+      history.unshift({ id:Date.now(), problem:parsed.problem, answer:parsed.answer,
+        time:new Date().toLocaleString('ko-KR',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) });
+      if (history.length > 20) history = history.slice(0,20);
       localStorage.setItem('mathHistory', JSON.stringify(history));
     }
   } catch (err) {
-    resultArea.innerHTML = `<div class="error-box">⚠️ 오류: ${err.message}</div>`;
+    resultArea.innerHTML = `<div class="error-box">⚠️ ${err.message}</div>`;
   } finally {
     solveBtn.disabled = false;
     solveBtnIcon.textContent = '🔄';
@@ -507,21 +400,22 @@ solveBtn.addEventListener('click', async () => {
   }
 });
 
-historyBtn.addEventListener('click', () => { drawerBg.classList.add('open'); drawer.classList.add('open'); renderHistory(); });
-drawerBg.addEventListener('click', () => { drawerBg.classList.remove('open'); drawer.classList.remove('open'); });
-
-function renderHistory() {
-  if (!history.length) {
-    drawerList.innerHTML = '<div class="drawer-empty">아직 풀이 기록이 없어요<br><br>📸 문제를 찍어 풀어보세요!</div>';
-    return;
-  }
-  drawerList.innerHTML = history.map(h => `
+// ── 히스토리
+document.getElementById('historyBtn').addEventListener('click', () => {
+  document.getElementById('drawerBg').classList.add('open');
+  document.getElementById('drawer').classList.add('open');
+  const list = document.getElementById('drawerList');
+  list.innerHTML = history.length ? history.map(h=>`
     <div class="history-item">
-      <div class="history-problem">${h.problem || '문제'}</div>
-      <div class="history-answer">정답: ${h.answer || ''}</div>
+      <div class="history-problem">${h.problem||'문제'}</div>
+      <div class="history-answer">정답: ${h.answer||''}</div>
       <div class="history-time">${h.time}</div>
-    </div>`).join('');
-}
+    </div>`).join('') : '<div class="drawer-empty">아직 풀이 기록이 없어요<br><br>📸 문제를 찍어 풀어보세요!</div>';
+});
+document.getElementById('drawerBg').addEventListener('click', () => {
+  document.getElementById('drawerBg').classList.remove('open');
+  document.getElementById('drawer').classList.remove('open');
+});
 </script>
 </body>
 </html>
