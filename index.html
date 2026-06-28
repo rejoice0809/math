@@ -433,6 +433,17 @@ solveBtn.addEventListener('click', async () => {
     if (data.error) throw new Error(data.error.message || 'API 오류');
 
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+
+    // 전체 응답 디버그 출력
+    if (!raw) {
+      resultArea.innerHTML = `
+        <div class="error-box" style="flex-direction:column;align-items:flex-start;gap:6px">
+          <div>⚠️ 응답 없음 — 전체 데이터:</div>
+          <div style="font-size:11px;color:#fca5a5;word-break:break-all;background:#1a0000;padding:8px;border-radius:6px;width:100%;max-height:200px;overflow-y:auto">${JSON.stringify(data, null, 2)}</div>
+        </div>`;
+      return;
+    }
+
     let parsed;
     try {
       const clean = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
@@ -444,12 +455,11 @@ solveBtn.addEventListener('click', async () => {
       } catch { parsed = null; }
     }
 
-    // 파싱 실패 시 raw 응답을 직접 보여줌 (디버그용)
     if (!parsed) {
       resultArea.innerHTML = `
         <div class="error-box" style="flex-direction:column;align-items:flex-start;gap:6px">
           <div>⚠️ 파싱 실패 — 실제 응답:</div>
-          <div style="font-size:12px;color:#fca5a5;word-break:break-all;background:#1a0000;padding:8px;border-radius:6px;width:100%">${raw || JSON.stringify(data)}</div>
+          <div style="font-size:11px;color:#fca5a5;word-break:break-all;background:#1a0000;padding:8px;border-radius:6px;width:100%;max-height:200px;overflow-y:auto">${raw}</div>
         </div>`;
       return;
     }
