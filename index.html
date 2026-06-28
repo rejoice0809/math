@@ -415,12 +415,16 @@ solveBtn.addEventListener('click', async () => {
           contents: [{
             parts: [
               { inline_data: { mime_type: currentType, data: currentBase64 } },
-              { text: `수학 문제 풀이 전문가입니다. 이미지의 수학 문제를 분석해 아래 JSON만 반환하세요. 마크다운 없이 순수 JSON만:
-{"problem":"인식된 수학 문제","steps":["단계1","단계2","단계3"],"answer":"최종 답","explanation":"핵심 개념 한 줄"}
-문제를 인식할 수 없으면: {"error":"인식 실패 이유"}` }
+              { text: `이 이미지의 수학 문제를 풀어주세요. 반드시 아래 JSON 형식으로만 응답하세요. 다른 텍스트는 절대 포함하지 마세요:
+{"problem":"인식된 수학 문제 텍스트","steps":["풀이 단계1","풀이 단계2","풀이 단계3"],"answer":"최종 답","explanation":"핵심 개념 한 줄 설명"}
+수학 문제가 없으면: {"error":"수학 문제를 찾을 수 없습니다"}` }
             ]
           }],
-          generationConfig: { temperature: 0.1, maxOutputTokens: 1000 }
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 1500,
+            responseMimeType: 'application/json'
+          }
         })
       }
     );
@@ -430,8 +434,19 @@ solveBtn.addEventListener('click', async () => {
 
     const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
     let parsed;
-    try { parsed = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
-    catch { parsed = { error: '응답 파싱 실패. 다시 시도해주세요.' }; }
+    try {
+      // 코드블록 제거 후 JSON 파싱 시도
+      const clean = raw.replace(/```json\s*/gi, '').replace(/```\s*/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch {
+      // JSON 블록만 추출해서 재시도
+      try {
+        const match = raw.match(/\{[\s\S]*\}/);
+        parsed = match ? JSON.parse(match[0]) : { error: '응답을 인식할 수 없습니다.' };
+      } catch {
+        parsed = { error: '응답 파싱 실패. 다시 시도해주세요.' };
+      }
+    }
 
     if (parsed.error) {
       resultArea.innerHTML = `<div class="error-box">⚠️ ${parsed.error}</div>`;
