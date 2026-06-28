@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f0f0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="수학풀기">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>수학 문제 풀기</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #222222;
+    --border: #2a2a2a;
+    --border2: #333;
+    --blue: #3b82f6;
+    --blue-dim: #1d4ed8;
+    --blue-glow: rgba(59,130,246,0.15);
+    --text: #f0f0f0;
+    --text2: #a0a0a0;
+    --text3: #606060;
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.12);
+    --red: #ef4444;
+    --red-dim: rgba(239,68,68,0.12);
+    --radius: 14px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: -apple-system, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100dvh;
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+    overscroll-behavior: none;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px 12px;
+    border-bottom: 0.5px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 10;
+  }
+  .header-logo {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .logo-icon {
+    width: 34px; height: 34px; background: var(--blue);
+    border-radius: 9px; display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .header h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  .header-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
+  .history-btn {
+    background: var(--surface); border: 0.5px solid var(--border2);
+    border-radius: 10px; padding: 7px 12px; color: var(--text2);
+    font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px;
+  }
+  .history-btn:active { opacity: 0.7; }
+
+  /* ── Main scroll area ── */
+  .main { padding: 20px 16px 100px; }
+
+  /* ── Upload card ── */
+  .upload-card {
+    border: 1.5px dashed var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface);
+    position: relative;
+    overflow: hidden;
+    min-height: 200px;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 10px; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+  .upload-card:active { background: var(--surface2); }
+  .upload-card.has-image { border-style: solid; border-color: var(--border2); min-height: unset; }
+  .upload-card input[type=file] {
+    position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer;
+  }
+  .upload-icon { font-size: 40px; }
+  .upload-label { font-size: 15px; font-weight: 500; color: var(--text); }
+  .upload-sub { font-size: 12px; color: var(--text3); }
+
+  .preview-img { width: 100%; display: block; border-radius: 12px; max-height: 320px; object-fit: contain; background: #111; }
+  .img-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .img-action-btn {
+    flex: 1; padding: 10px; border-radius: 10px; font-size: 13px; font-weight: 500;
+    cursor: pointer; border: 0.5px solid var(--border2); background: var(--surface2);
+    color: var(--text2); display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
+  .img-action-btn:active { opacity: 0.6; }
+
+  /* ── Tips ── */
+  .tips { margin-top: 14px; display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
+  .tips::-webkit-scrollbar { display: none; }
+  .tip-chip {
+    flex-shrink: 0; padding: 6px 12px; border-radius: 20px;
+    background: var(--surface); border: 0.5px solid var(--border2);
+    font-size: 12px; color: var(--text2); display: flex; align-items: center; gap: 5px;
+    white-space: nowrap;
+  }
+
+  /* ── Solve button ── */
+  .solve-wrap {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    padding: 12px 16px calc(12px + var(--safe-bottom));
+    background: linear-gradient(to top, var(--bg) 70%, transparent);
+    z-index: 20;
+  }
+  .solve-btn {
+    width: 100%; padding: 16px; border-radius: 14px;
+    background: var(--blue); color: #fff;
+    font-size: 16px; font-weight: 600; letter-spacing: -0.2px;
+    border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.15s, transform 0.1s;
+    box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+  }
+  .solve-btn:active { transform: scale(0.98); background: var(--blue-dim); }
+  .solve-btn:disabled { background: #1e293b; color: #475569; box-shadow: none; cursor: not-allowed; }
+
+  /* ── Result ── */
+  .result-wrap { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+
+  .result-block {
+    background: var(--surface);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .block-header {
+    padding: 12px 16px 10px;
+    border-bottom: 0.5px solid var(--border);
+    display: flex; align-items: center; gap: 8px;
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.06em; color: var(--text3);
+  }
+  .block-header-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--blue); flex-shrink: 0;
+  }
+  .block-body { padding: 14px 16px; }
+  .problem-text { font-size: 15px; line-height: 1.6; color: var(--text); }
+
+  .step-item {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 10px 0; border-bottom: 0.5px solid var(--border);
+  }
+  .step-item:last-child { border-bottom: none; padding-bottom: 0; }
+  .step-num {
+    width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+    background: var(--blue-glow); border: 0.5px solid var(--blue);
+    color: var(--blue); font-size: 12px; font-weight: 600;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .step-text { font-size: 14px; line-height: 1.65; color: var(--text); padding-top: 2px; }
+
+  .answer-block {
+    background: var(--green-dim);
+    border-color: rgba(34,197,94,0.25);
+  }
+  .answer-block .block-header-dot { background: var(--green); }
+  .answer-num {
+    font-size: 28px; font-weight: 700; color: var(--green);
+    letter-spacing: -0.5px; margin-bottom: 4px;
+  }
+  .answer-concept { font-size: 13px; color: var(--text2); margin-top: 6px; line-height: 1.5; }
+
+  /* ── Error ── */
+  .error-box {
+    background: var(--red-dim); border: 0.5px solid rgba(239,68,68,0.25);
+    border-radius: var(--radius); padding: 14px 16px;
+    color: var(--red); font-size: 14px; display: flex; align-items: center; gap: 10px;
+  }
+
+  /* ── Loading ── */
+  .loading-box {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 12px; padding: 32px 16px;
+    background: var(--surface); border-radius: var(--radius);
+    border: 0.5px solid var(--border2);
+  }
+  .spinner {
+    width: 36px; height: 36px; border-radius: 50%;
+    border: 2.5px solid var(--border2);
+    border-top-color: var(--blue);
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 14px; color: var(--text2); }
+  .loading-dots::after {
+    content: ''; animation: dots 1.5s steps(4, end) infinite;
+  }
+  @keyframes dots { 0%{content:''} 25%{content:'.'} 50%{content:'..'} 75%{content:'...'} }
+
+  /* ── History drawer ── */
+  .drawer-bg {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+    z-index: 50; opacity: 0; pointer-events: none;
+    transition: opacity 0.25s;
+  }
+  .drawer-bg.open { opacity: 1; pointer-events: all; }
+  .drawer {
+    position: fixed; bottom: 0; left: 0; right: 0;
+    background: var(--surface); border-radius: 20px 20px 0 0;
+    z-index: 51; transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    max-height: 75dvh; display: flex; flex-direction: column;
+    padding-bottom: var(--safe-bottom);
+  }
+  .drawer.open { transform: translateY(0); }
+  .drawer-handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border2); margin: 12px auto 4px; flex-shrink: 0; }
+  .drawer-title { font-size: 16px; font-weight: 600; padding: 8px 20px 14px; border-bottom: 0.5px solid var(--border); flex-shrink: 0; }
+  .drawer-list { overflow-y: auto; flex: 1; }
+  .history-item {
+    padding: 14px 20px; border-bottom: 0.5px solid var(--border);
+    cursor: pointer; transition: background 0.1s;
+  }
+  .history-item:active { background: var(--surface2); }
+  .history-problem { font-size: 14px; color: var(--text); margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .history-answer { font-size: 13px; color: var(--green); font-weight: 500; }
+  .history-time { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .drawer-empty { padding: 40px 20px; text-align: center; color: var(--text3); font-size: 14px; }
+
+  /* ── Install banner ── */
+  .install-banner {
+    margin-top: 14px;
+    background: var(--blue-glow);
+    border: 0.5px solid rgba(59,130,246,0.3);
+    border-radius: var(--radius); padding: 12px 14px;
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: var(--text2);
+  }
+  .install-banner strong { color: var(--blue); display: block; font-size: 13px; margin-bottom: 2px; }
+  .install-banner-icon { font-size: 24px; flex-shrink: 0; }
+  .install-btn-inline {
+    margin-left: auto; flex-shrink: 0; padding: 7px 12px;
+    background: var(--blue); color: #fff;
+    border-radius: 8px; border: none; font-size: 12px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
+  }
+  .close-banner {
+    background: none; border: none; color: var(--text3);
+    font-size: 16px; cursor: pointer; padding: 4px; flex-shrink: 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-logo">
+    <div class="logo-icon">🧮</div>
+    <div>
+      <div class="header h1" style="font-size:17px;font-weight:600">수학 문제 풀기</div>
+      <div class="header-sub">AI 수식 인식 · 단계별 풀이</div>
+    </div>
+  </div>
+  <button class="history-btn" id="historyBtn">📋 기록</button>
+</div>
+
+<div class="main">
+
+  <!-- Install banner (shown until dismissed or installed) -->
+  <div class="install-banner" id="installBanner" style="display:none">
+    <div class="install-banner-icon">📲</div>
+    <div style="flex:1">
+      <strong>앱으로 설치하기</strong>
+      브라우저 메뉴 → "홈 화면에 추가"
+    </div>
+    <button class="close-banner" id="closeBanner">✕</button>
+  </div>
+
+  <!-- Upload area -->
+  <div style="margin-top:16px">
+    <div class="upload-card" id="uploadCard">
+      <input type="file" id="fileInput" accept="image/*" capture="environment">
+      <div class="upload-icon" id="uploadIcon">📸</div>
+      <div class="upload-label" id="uploadLabel">사진 찍기 또는 업로드</div>
+      <div class="upload-sub" id="uploadSub">수학 문제가 잘 보이게 찍어주세요</div>
+    </div>
+
+    <div id="previewSection" style="display:none">
+      <img id="previewImg" class="preview-img" alt="업로드된 수학 문제">
+      <div class="img-actions">
+        <button class="img-action-btn" id="retakeBtn">📷 다시 찍기</button>
+        <button class="img-action-btn" id="cropHint" style="color:#60a5fa;border-color:rgba(59,130,246,0.3)">✂️ 문제 부분만</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tips -->
+  <div class="tips">
+    <div class="tip-chip">💡 글씨가 선명하게</div>
+    <div class="tip-chip">🔦 밝은 곳에서 촬영</div>
+    <div class="tip-chip">📐 수직으로 정면에서</div>
+    <div class="tip-chip">✂️ 문제만 포함하기</div>
+  </div>
+
+  <!-- Result area -->
+  <div id="resultArea"></div>
+
+</div>
+
+<!-- Fixed solve button -->
+<div class="solve-wrap">
+  <button class="solve-btn" id="solveBtn" disabled>
+    <span id="solveBtnIcon">🔍</span>
+    <span id="solveBtnText">사진을 먼저 선택해주세요</span>
+  </button>
+</div>
+
+<!-- History drawer -->
+<div class="drawer-bg" id="drawerBg"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-handle"></div>
+  <div class="drawer-title">풀이 기록</div>
+  <div class="drawer-list" id="drawerList"></div>
+</div>
+
+<script>
+const fileInput = document.getElementById('fileInput');
+const uploadCard = document.getElementById('uploadCard');
+const previewSection = document.getElementById('previewSection');
+const previewImg = document.getElementById('previewImg');
+const uploadIcon = document.getElementById('uploadIcon');
+const uploadLabel = document.getElementById('uploadLabel');
+const uploadSub = document.getElementById('uploadSub');
+const retakeBtn = document.getElementById('retakeBtn');
+const solveBtn = document.getElementById('solveBtn');
+const solveBtnIcon = document.getElementById('solveBtnIcon');
+const solveBtnText = document.getElementById('solveBtnText');
+const resultArea = document.getElementById('resultArea');
+const historyBtn = document.getElementById('historyBtn');
+const drawer = document.getElementById('drawer');
+const drawerBg = document.getElementById('drawerBg');
+const drawerList = document.getElementById('drawerList');
+const installBanner = document.getElementById('installBanner');
+const closeBanner = document.getElementById('closeBanner');
+
+let currentBase64 = null;
+let currentType = null;
+let history = JSON.parse(localStorage.getItem('mathHistory') || '[]');
+
+// PWA install
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js').catch(() => {});
+}
+
+// Show install banner on iOS (no beforeinstallprompt)
+const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+const isStandalone = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone;
+if (isIOS && !isStandalone && !localStorage.getItem('bannerClosed')) {
+  installBanner.style.display = 'flex';
+  installBanner.style.marginTop = '14px';
+}
+closeBanner.addEventListener('click', () => {
+  installBanner.style.display = 'none';
+  localStorage.setItem('bannerClosed', '1');
+});
+
+// Android beforeinstallprompt
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  if (!isStandalone && !localStorage.getItem('bannerClosed')) {
+    installBanner.style.display = 'flex';
+    installBanner.innerHTML = `
+      <div class="install-banner-icon">📲</div>
+      <div style="flex:1"><strong>앱으로 설치</strong>설치하면 오프라인에서도 사용 가능해요</div>
+      <button class="install-btn-inline" id="installNow">설치</button>
+      <button class="close-banner" id="closeBanner2">✕</button>`;
+    document.getElementById('installNow').addEventListener('click', () => {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(() => { installBanner.style.display = 'none'; });
+    });
+    document.getElementById('closeBanner2').addEventListener('click', () => {
+      installBanner.style.display = 'none';
+      localStorage.setItem('bannerClosed', '1');
+    });
+  }
+});
+
+// File input
+fileInput.addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const dataUrl = ev.target.result;
+    currentBase64 = dataUrl.split(',')[1];
+    currentType = file.type || 'image/jpeg';
+    previewImg.src = dataUrl;
+    uploadCard.style.display = 'none';
+    previewSection.style.display = 'block';
+    solveBtn.disabled = false;
+    solveBtnIcon.textContent = '✨';
+    solveBtnText.textContent = '이 문제 풀기';
+    resultArea.innerHTML = '';
+  };
+  reader.readAsDataURL(file);
+});
+
+retakeBtn.addEventListener('click', () => {
+  currentBase64 = null; currentType = null;
+  previewImg.src = '';
+  fileInput.value = '';
+  uploadCard.style.display = 'flex';
+  previewSection.style.display = 'none';
+  solveBtn.disabled = true;
+  solveBtnIcon.textContent = '🔍';
+  solveBtnText.textContent = '사진을 먼저 선택해주세요';
+  resultArea.innerHTML = '';
+});
+
+document.getElementById('cropHint').addEventListener('click', () => {
+  alert('💡 팁: 문제 부분만 잘라서 찍으면 더 정확하게 인식해요!');
+});
+
+// Solve
+solveBtn.addEventListener('click', async () => {
+  if (!currentBase64 || solveBtn.disabled) return;
+  solveBtn.disabled = true;
+  solveBtnIcon.textContent = '⏳';
+  solveBtnText.textContent = '분석 중...';
+
+  resultArea.innerHTML = `
+    <div class="loading-box" style="margin-top:20px">
+      <div class="spinner"></div>
+      <div class="loading-text">문제를 인식하는 중<span class="loading-dots"></span></div>
+    </div>`;
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: `수학 문제 풀이 전문가입니다. 이미지의 수학 문제를 분석해 아래 JSON만 반환하세요. 마크다운 없이 순수 JSON만:
+{"problem":"인식된 수학 문제","steps":["단계1","단계2","단계3"],"answer":"최종 답","explanation":"핵심 개념 한 줄"}
+문제를 인식할 수 없으면: {"error":"인식 실패 이유"}`,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: currentType, data: currentBase64 } },
+            { type: 'text', text: '이 수학 문제를 풀어주세요.' }
+          ]
+        }]
+      })
+    });
+
+    const data = await resp.json();
+    const raw = data.content?.find(b => b.type === 'text')?.text || '';
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g, '').trim()); }
+    catch { parsed = { error: '응답 파싱 실패. 다시 시도해주세요.' }; }
+
+    if (parsed.error) {
+      resultArea.innerHTML = `<div class="error-box" style="margin-top:20px">⚠️ ${parsed.error}</div>`;
+    } else {
+      const stepsHtml = (parsed.steps || []).map((s, i) => `
+        <div class="step-item">
+          <div class="step-num">${i + 1}</div>
+          <div class="step-text">${s}</div>
+        </div>`).join('');
+
+      resultArea.innerHTML = `
+        <div class="result-wrap">
+          <div class="result-block">
+            <div class="block-header"><div class="block-header-dot"></div>인식된 문제</div>
+            <div class="block-body"><div class="problem-text">${parsed.problem || ''}</div></div>
+          </div>
+          <div class="result-block">
+            <div class="block-header"><div class="block-header-dot"></div>풀이 과정</div>
+            <div class="block-body">${stepsHtml}</div>
+          </div>
+          <div class="result-block answer-block">
+            <div class="block-header"><div class="block-header-dot" style="background:var(--green)"></div>정답</div>
+            <div class="block-body">
+              <div class="answer-num">${parsed.answer || ''}</div>
+              ${parsed.explanation ? `<div class="answer-concept">💡 ${parsed.explanation}</div>` : ''}
+            </div>
+          </div>
+        </div>`;
+
+      // Save to history
+      const entry = {
+        id: Date.now(),
+        problem: parsed.problem,
+        answer: parsed.answer,
+        steps: parsed.steps,
+        explanation: parsed.explanation,
+        time: new Date().toLocaleString('ko-KR', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+      };
+      history.unshift(entry);
+      if (history.length > 20) history = history.slice(0, 20);
+      localStorage.setItem('mathHistory', JSON.stringify(history));
+    }
+  } catch (err) {
+    resultArea.innerHTML = `<div class="error-box" style="margin-top:20px">⚠️ 오류: ${err.message}</div>`;
+  } finally {
+    solveBtn.disabled = false;
+    solveBtnIcon.textContent = '🔄';
+    solveBtnText.textContent = '다시 풀기';
+  }
+});
+
+// History drawer
+historyBtn.addEventListener('click', openDrawer);
+drawerBg.addEventListener('click', closeDrawer);
+
+function openDrawer() {
+  drawerBg.classList.add('open');
+  drawer.classList.add('open');
+  renderHistory();
+}
+function closeDrawer() {
+  drawerBg.classList.remove('open');
+  drawer.classList.remove('open');
+}
+
+function renderHistory() {
+  if (!history.length) {
+    drawerList.innerHTML = '<div class="drawer-empty">아직 풀이 기록이 없어요<br><br>📸 문제를 찍어 풀어보세요!</div>';
+    return;
+  }
+  drawerList.innerHTML = history.map(h => `
+    <div class="history-item">
+      <div class="history-problem">${h.problem || '문제'}</div>
+      <div class="history-answer">정답: ${h.answer || ''}</div>
+      <div class="history-time">${h.time}</div>
+    </div>`).join('');
+}
+</script>
+</body>
+</html>
